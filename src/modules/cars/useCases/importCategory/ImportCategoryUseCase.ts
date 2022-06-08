@@ -23,17 +23,18 @@ class ImportCategoryUseCase {
       const parseFile = csvParse();
 
       stream.pipe(parseFile)
-        
+
       parseFile.on("data", async (line) => {
         const [name, description] = line;
 
         categories.push({ name, description });
       })
-      .on("end", () =>{
-        resolve(categories);
-      }).on("error", (err) =>{
-        reject(err);
-      })
+        .on("end", () => {
+          fs.promises.unlink(file.path);
+          resolve(categories);
+        }).on("error", (err) => {
+          reject(err);
+        })
     });
   }
 
@@ -41,11 +42,11 @@ class ImportCategoryUseCase {
   async execute(file: Express.Multer.File): Promise<void> {
     const categories = await this.loadCategories(file);
     categories.map(async (category) => {
-      const {name, description} = category;
+      const { name, description } = category;
 
       const existCategory = this.categoriesRepository.findByName(name);
 
-      if(!existCategory){
+      if (!existCategory) {
         this.categoriesRepository.create({
           name,
           description
