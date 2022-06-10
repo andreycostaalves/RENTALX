@@ -16,6 +16,7 @@ const upLoad = multer({
 })
 
 categoriesRoutes.post('/', (request, response) => {
+
   return createCategoryController.handle(request, response);
 });
 
